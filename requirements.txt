@@ -1,0 +1,9 @@
+customtkinter
+openai
+python-dotenv
+streamlit
+langchain
+wikipedia
+chromadb
+tiktoken
+altair==4.0

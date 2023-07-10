@@ -64,60 +64,90 @@ class App(customtkinter.CTk):
         self.title("Simple RPG NPC Template Generator")
         self.geometry(f"{1200}x{850}")
 
-        # configure grid layout 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=0)
-        self.grid_rowconfigure((0, 3), weight=1)
-        self.grid_rowconfigure((1, 2), weight=0)
-        self.grid_rowconfigure(4, weight=5)
+        # configure grid layout                     OLD
+        #self.grid_columnconfigure(0, weight=1)
+        #self.grid_columnconfigure(1, weight=0)
+        #self.grid_rowconfigure((0, 3), weight=1)
+        #self.grid_rowconfigure((1, 2), weight=0)
+        #self.grid_rowconfigure(4, weight=5)
 
+        # Tab based config
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0)
+        
+
+        # Create master Tabs
+        # Tabs: Character Creator | Character Selector (Editor?) | Conversation
+        self.tabview = customtkinter.CTkTabview(self, width=250)
+        self.tabview.grid(row=0, column=0, padx=(0, 0), pady=(0, 0), sticky="nsew")
+        self.tabview.add("Start")
+        self.tabview.add("Character Creator")
+        self.tabview.add("Character Selector")
+        # Config tab grids
+        # Character Creator Tab
+        self.tabview.tab("Character Creator").grid_columnconfigure(0, weight=1)
+        self.tabview.tab("Character Creator").grid_columnconfigure(1, weight=0)
+        self.tabview.tab("Character Creator").grid_rowconfigure((0, 3), weight=1)
+        self.tabview.tab("Character Creator").grid_rowconfigure((1, 2), weight=0)
+        self.tabview.tab("Character Creator").grid_rowconfigure(4, weight=5)
+        # Character Selector Tab
+        self.tabview.tab("Character Selector").grid_columnconfigure(0, weight=1)
+
+        #=======================================================================================
+        # TAB: Start (Testing, title screen maybe)
+        #=======================================================================================
+        self.start_textbox = customtkinter.CTkTextbox(self.tabview.tab("Start"), width=1150, height=700)
+        self.start_textbox.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
+        self.start_textbox.grid_rowconfigure(0, weight=1)
+
+        #=======================================================================================
+        # TAB: Character Creator
+        #=======================================================================================
 
         # create textbox to preview the template
-        self.template_textbox = customtkinter.CTkTextbox(self, width=250, height=20)
-        self.template_textbox.grid(row=0, column=0, padx=(5, 0), pady=(20, 0), sticky="nsew")
+        self.template_textbox = customtkinter.CTkTextbox(self.tabview.tab("Character Creator"), width=250, height=20)
+        self.template_textbox.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
         # template button
-        self.button_tempalte = customtkinter.CTkButton(master=self, text="Generate Template", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
+        self.button_tempalte = customtkinter.CTkButton(master=self.tabview.tab("Character Creator"), text="Generate Template", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
                                                      command=self.button_template_event)
         self.button_tempalte.grid(row=1, column=0, padx=(20, 20), pady=(5, 5), sticky="nsew")
 
         # create textbox to show generated text
-        self.generated_textbox = customtkinter.CTkTextbox(self,width=250, height=400)
+        self.generated_textbox = customtkinter.CTkTextbox(self.tabview.tab("Character Creator"),width=250, height=300)
         self.generated_textbox.grid(row=3, column=0, padx=(5, 0), pady=(5, 0), sticky="nsew")
         # generate response button
-        self.button_generate = customtkinter.CTkButton(master=self, text="Generate AI Response", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
+        self.button_generate = customtkinter.CTkButton(master=self.tabview.tab("Character Creator"), text="Generate AI Response", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
                                                      command=self.button_generate_event)
         self.button_generate.grid(row=2, column=0, padx=(20, 20), pady=(5, 5), sticky="nsew")
 
         # Generate save button to save the generated response to a file
-        self.button_save = customtkinter.CTkButton(master=self, text="Save Generated Character", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
+        self.button_save = customtkinter.CTkButton(master=self.tabview.tab("Character Creator"), text="Save Generated Character", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
                                                    command=self.button_save_event)
         self.button_save.grid(row=4, column=1, padx=(20, 20), pady=(5, 5), sticky="nsew")
         # create test button
-        self.button_test = customtkinter.CTkButton(master=self, text="Test Button", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
+        self.button_test = customtkinter.CTkButton(master=self.tabview.tab("Character Creator"), text="Test Button", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), 
                                                    command=lambda: self.extract_text_after_pattern(
                                                         text=self.generated_textbox.get("1.0", "end-1c"), 
                                                         start_pattern="Full name:", 
                                                         end_pattern="Nickname:")
-                                                        ) # testing, return origonal button_save_event
+                                                        ) # testing extraction function
         self.button_test.grid(row=4, column=0, padx=(20, 20), pady=(5, 5), sticky="e")
 
         # create token counter frame
-        self.token_frame = customtkinter.CTkFrame(self)
-        self.token_frame.grid(row=4, column=0, padx=(5, 5), pady=(5, 5), sticky="w")
-        self.token_frame.grid_columnconfigure(0, weight=1)
+        self.token_frame = customtkinter.CTkFrame(self, height=40, width=250)
+        self.token_frame.grid(row=1, column=0, padx=(5, 5), pady=(5, 5), sticky="w")
         # create token counter under the AI generated response 
-        self.tokens_label = customtkinter.CTkLabel(master=self.token_frame, text="Tokens Used: ")
-        self.tokens_label.grid(row=0, column=0, padx=(5, 5), pady=(5, 5), sticky="n")
-        self.tokens_text = customtkinter.CTkTextbox(master=self.token_frame)
-        self.tokens_text.grid(row=0, column=1, padx=(0, 0), pady=(0, 0), sticky="n")
+        self.tokens_label = customtkinter.CTkLabel(master=self.token_frame, text="Tokens Used: ", height=40, width=50)
+        self.tokens_label.grid(row=0, column=0, padx=(5, 0), pady=(5, 0), sticky="n")
+        self.tokens_text = customtkinter.CTkTextbox(master=self.token_frame, height=65, width=200)
+        self.tokens_text.grid(row=0, column=1, padx=(5, 0), pady=(5, 0), sticky="n")
         self.tokens_text.insert("0.0", "")
         self.token_info = customtkinter.CTkLabel(master=self.token_frame, text="Token cost 4k Context Input: $0.0015 Output: $0.002 per 1k tokens")
 
 
-
-
         # Right column || Scrollable Frame || Where user can enter parameter
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self, height=800, label_text="Custom Parameters")
+        self.scrollable_frame = customtkinter.CTkScrollableFrame(self.tabview.tab("Character Creator"), height=800, label_text="Custom Parameters")
         self.scrollable_frame.grid(row=0, rowspan=4, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
         #self.scrollable_frame.grid_columnconfigure(0, weight=1)
         self.scrollable_frame_entries = list(defaults.values())
@@ -251,9 +281,9 @@ class App(customtkinter.CTk):
         prompt_cost = (prompt_tokens/1000) * 0.0015
         completion_cost = (completion_tokens/1000) * 0.002
         total_tokens = prompt_tokens + completion_tokens
-        total_cost = round(prompt_cost + completion_cost, 3)
+        total_cost = round(prompt_cost + completion_cost, 4)
 
-        token_printout = f"Input Tokens: {prompt_tokens}[${round(prompt_cost, 3)}] Output Tokens: {completion_tokens}[${round(completion_cost, 3)}] Total: {total_tokens}[${total_cost}]"
+        token_printout = f"Input Tokens: {prompt_tokens}[${round(prompt_cost, 4)}] Output Tokens: {completion_tokens}[${round(completion_cost, 4)}] Total: {total_tokens}[${total_cost}]"
         
         # print generated results to generated_textbox
         self.generated_textbox.delete("0.0", "end")
